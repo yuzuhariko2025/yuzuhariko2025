@@ -67,7 +67,7 @@ body {
     font-size: 16px;
     border: 1px solid #ddd;
     border-radius: 4px 0 0 4px;
-    transition: all 0.3s;ㅁㄴㅇㅁㄴ
+    transition: all 0.3s;
 }
 
 #searchInput:focus {
@@ -79,7 +79,7 @@ body {
 #searchButton {
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #9795d4;
+    background-color: #A6D0A6;
     color: white;
     border: none;
     border-radius: 0 4px 4px 0;
@@ -111,7 +111,7 @@ td {
 }
 
 .highlight {
-    background-color: #9795d4;
+    background-color: #d2e7d2;
 }
 
 #notification {
@@ -147,7 +147,7 @@ td {
 
 #resultNavigation button {
     padding: 5px 10px;
-    background-color: #9795d4;
+    background-color: #A6D0A6;
     color: white;
     border: none;
     border-radius: 3px;
@@ -165,7 +165,7 @@ td {
     border: none;
     outline: none;
     background-color: white;
-    color: #9795d4;
+    color: #A6D0A6;
     cursor: pointer;
     border-radius: 50%;
     font-size: 24px;
