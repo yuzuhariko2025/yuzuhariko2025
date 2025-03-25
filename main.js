@@ -1,26 +1,6 @@
 let currentResultIndex = 0;
 let searchResults = [];
 
-function initializeWelcomeOverlay() {
-    const overlay = document.getElementById('welcomeOverlay');
-    const closeBtn = document.getElementById('welcomeCloseBtn');
-
-    // 3초 후에 닫기 버튼 표시
-    setTimeout(() => {
-        closeBtn.style.visibility = 'visible';
-        closeBtn.style.opacity = '1';
-    }, 1500);
-
-    // 닫기 버튼 클릭 이벤트
-    closeBtn.addEventListener('click', () => {
-        overlay.style.opacity = '0';
-        overlay.style.pointerEvents = 'none';
-        setTimeout(() => {
-            overlay.style.display = 'none';
-        }, 500);
-    });
-}
-
 function showNotification(message) {
     const notification = document.getElementById('notification');
     notification.textContent = message;
@@ -126,51 +106,14 @@ async function loadSponsors() {
             const section = document.createElement('div');
             section.className = 'sponsor-section';
 
-            // 첫 그룹 슬라이더 적용
-            if (index === 0) {
-                const sliderContainer = document.createElement('div');
-                sliderContainer.className = 'slider-container';
-
-                const sliderWrapper = document.createElement('div');
-                sliderWrapper.className = 'slider-wrapper';
-
-                // 배열로 변경된 이미지 데이터로 슬라이드 생성
-                const img1 = document.createElement('img');
-                img1.src = group.image[0];
-                img1.className = 'slide';
-
-                const img2 = document.createElement('img');
-                img2.src = group.image[1];
-                img2.className = 'slide';
-
-                sliderWrapper.appendChild(img1);
-                sliderWrapper.appendChild(img2);
-
-                const paginationDots = document.createElement('div');
-                paginationDots.className = 'pagination-dots';
-                paginationDots.innerHTML = `
-                    <span class="dot active"></span>
-                    <span class="dot"></span>
-                `;
-
-                sliderContainer.appendChild(sliderWrapper);
-                sliderContainer.appendChild(paginationDots);
-                section.appendChild(sliderContainer);
-
-                // 슬라이더 기능 초기화
-                initializeSlider(sliderWrapper);
-
-            } else if (index > 0) {
-
-                const imageDiv = document.createElement('div');
-                imageDiv.className = 'sponsor-image';
-                const img = document.createElement('img');
-                img.src = group.image;  // 나머지 그룹은 단일 이미지
-                img.alt = `사진 ${index + 1}`;
-                img.className = 'cover-image';
-                imageDiv.appendChild(img);
-                section.appendChild(imageDiv);
-            }
+            const imageDiv = document.createElement('div');
+            imageDiv.className = 'sponsor-image';
+            const img = document.createElement('img');
+            img.src = group.image;  // 나머지 그룹은 단일 이미지
+            img.alt = `사진 ${index + 1}`;
+            img.className = 'cover-image';
+            imageDiv.appendChild(img);
+            section.appendChild(imageDiv);
 
             // 첫 번째 그룹에만 검색 바 추가
             if (index === 0) {
@@ -231,136 +174,8 @@ function scrollFunction() {
     }
 }
 
-// 슬라이드
-function initializeSlider(sliderWrapper) {
-    const sliderContainer = sliderWrapper.parentElement;
-    const dots = sliderContainer.querySelectorAll('.dot');
-    let startX = 0;
-    let currentTranslate = 0;
-    let prevTranslate = 0;
-    let isDragging = false;
-    let currentIndex = 0;
-    let animationID;
-    let autoSlideInterval;
-
-    function updateDots() {
-        dots.forEach((dot, index) => {
-            if (index === currentIndex) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
-            }
-        });
-    }
-
-    function startAutoSlide() {
-        if (autoSlideInterval) clearInterval(autoSlideInterval);
-        autoSlideInterval = setInterval(() => {
-            if (!isDragging) {
-                currentIndex = currentIndex === 0 ? 1 : 0;
-                currentTranslate = -currentIndex * 50;
-                sliderWrapper.style.transform = `translateX(${currentTranslate}%)`;
-                updateDots();
-            }
-        }, 5000);
-    }
-
-    function setSliderPosition() {
-        sliderWrapper.style.transform = `translateX(${currentTranslate}%)`;
-    }
-
-    function animation() {
-        if (isDragging) {
-            setSliderPosition();
-            requestAnimationFrame(animation);
-        }
-    }
-
-    function touchStart(event) {
-        startX = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-        isDragging = true;
-        sliderWrapper.style.transition = 'none';
-        if (autoSlideInterval) clearInterval(autoSlideInterval);
-
-        if (animationID) {
-            cancelAnimationFrame(animationID);
-        }
-        animationID = requestAnimationFrame(animation);
-    }
-
-    function touchMove(event) {
-        if (!isDragging) return;
-
-        const currentX = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-        const diff = (currentX - startX) / sliderWrapper.offsetWidth * 100;
-        currentTranslate = prevTranslate + diff;
-
-        // 바운스 효과 제한
-        if (currentTranslate > 0) {
-            currentTranslate = 0;
-        } else if (currentTranslate < -50) {
-            currentTranslate = -50;
-        }
-    }
-
-    function touchEnd() {
-        isDragging = false;
-        const movedBy = currentTranslate - prevTranslate;
-
-        sliderWrapper.style.transition = 'transform 0.3s ease-out';
-
-        if (Math.abs(movedBy) > 10) {
-            if (movedBy < 0) {
-                currentIndex = 1;
-                currentTranslate = -50;
-            } else {
-                currentIndex = 0;
-                currentTranslate = 0;
-            }
-        } else {
-            // 돌아가기
-            currentTranslate = currentIndex === 0 ? 0 : -50;
-        }
-
-        setSliderPosition();
-        updateDots();
-        prevTranslate = currentTranslate;
-        startAutoSlide();
-    }
-
-    // 터치 이벤트
-    sliderWrapper.addEventListener('touchstart', touchStart);
-    sliderWrapper.addEventListener('touchmove', touchMove);
-    sliderWrapper.addEventListener('touchend', touchEnd);
-
-    // 마우스 이벤트
-    sliderWrapper.addEventListener('mousedown', touchStart);
-    sliderWrapper.addEventListener('mousemove', touchMove);
-    sliderWrapper.addEventListener('mouseup', touchEnd);
-    sliderWrapper.addEventListener('mouseleave', touchEnd);
-
-    // 페이지네이션 dots 클릭 이벤트
-    dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            currentIndex = index;
-            currentTranslate = -index * 50;
-            sliderWrapper.style.transition = 'transform 0.3s ease-out';
-            setSliderPosition();
-            updateDots();
-            prevTranslate = currentTranslate;
-            startAutoSlide();
-        });
-    });
-
-    // 초기 상태 설정
-    updateDots();
-    startAutoSlide();
-}
-
 // 이벤트 리스너 설정
 function initializeEventListeners() {
-
-    initializeWelcomeOverlay();
 
     // 이전 및 다음 결과 버튼 이벤트 리스너
     document.getElementById('prevResult').addEventListener('click', function() {
